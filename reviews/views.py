@@ -3,6 +3,10 @@ from rest_framework import viewsets
 from TASK1.serializers import UserSerializer, GroupSerializer
 from django.shortcuts import get_object_or_404, render
 from .models import Review
+from .form import ReviewForm
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect
+from . import views
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -27,4 +31,15 @@ def review_list(request):
     return render(request, 'reviews/reviews_list.html', context)
 
 
+def add_review(request):
+    k = 1
+    if request.method == 'GET':
+        form = ReviewForm()
+        return render(request, 'reviews/addreviews.html', {'form': form})
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('http://127.0.0.1:8000/reviews/')
+        return render(request, 'reviews/addreviews.html', {'form': form})
 

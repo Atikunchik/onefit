@@ -8,6 +8,8 @@ from .form import ReviewForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from . import views
+from rest_framework.authtoken.models import Token
+import json
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -27,20 +29,35 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 def review_list(request):
-    latest_review_list = Review.objects.all()
-    context = {'latest_review_list': latest_review_list}
+    token = request.headers['Authorization']
+    user = User.objects.filter(auth_token=token).first()
+    if user is not None:
+        print(user)
+    else:
+        return HttpResponse("Permission denied")
+    user = User.objects.get(auth_token=token)
+    latest_review_list = Review.objects.filter(user=user)
+    # print(user.username)
+    context = {'latest_review_list': latest_review_list, 'user': user}
     return render(request, 'reviews/reviews_list.html', context)
 
 
 def add_review(request):
-    k = 1
+    token = request.headers['Authorization']
+    user = User.objects.filter(auth_token=token).first()
+    if user is not None:
+        print(user)
+    else:
+        return HttpResponse("Permission denied")
     if request.method == 'GET':
         form = ReviewForm()
         return render(request, 'reviews/addreviews.html', {'form': form})
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
-            form.save()
+            review = form.save(commit=False)
+            review.user = user
+            review.save()
             return redirect('http://127.0.0.1:8000/reviews/')
         return render(request, 'reviews/addreviews.html', {'form': form})
 
@@ -49,8 +66,10 @@ def login_user(request):
     if request.method == 'GET':
         form = AuthenticationForm()
     else:
-        form = AuthenticationForm(request.POST)
+        form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            return redirect('http://127.0.0.1:8000/reviews/')
+            token = Token.objects.get(user=user)
+            return HttpResponse(json.dumps({'token': token.key}), content_type='application/json')
+            #return redirect('http://127.0.0.1:8000/reviews/')
     return render(request, 'reviews/login.html', {'form': form})

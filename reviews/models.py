@@ -13,4 +13,4 @@ class Review(models.Model):
             MinValueValidator(1)
         ]
     )
-    username = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)

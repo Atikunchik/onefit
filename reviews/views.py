@@ -1,3 +1,4 @@
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from TASK1.serializers import UserSerializer, GroupSerializer
@@ -43,3 +44,13 @@ def add_review(request):
             return redirect('http://127.0.0.1:8000/reviews/')
         return render(request, 'reviews/addreviews.html', {'form': form})
 
+
+def login_user(request):
+    if request.method == 'GET':
+        form = AuthenticationForm()
+    else:
+        form = AuthenticationForm(request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            return redirect('http://127.0.0.1:8000/reviews/')
+    return render(request, 'reviews/login.html', {'form': form})

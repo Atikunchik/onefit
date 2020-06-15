@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views import generic
 from django.utils import timezone
-
+from ipware import get_client_ip
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -39,26 +39,21 @@ class DetailView(generic.DetailView):
 
 
 def del_rev(request, review_id):
-    print("work")
     token = request.headers['Authorization']
     user = User.objects.filter(auth_token=token).first()
     if user is None:
         return HttpResponse("Permission denied")
     user = User.objects.get(auth_token=token)
-    print(user.username)
     review = get_object_or_404(Review, pk=review_id)
-    print(review.user.id)
-    print(user.id != review.user.id)
-    print(user.is_superuser)
     if user.id != review.user.id and not user.is_superuser:
         return HttpResponse("Permission denied")
     Review.objects.filter(id=review_id).delete()
     return HttpResponse("deleting done")
 
 
-
 def review_list(request):
     token = request.headers['Authorization']
+    is_routable = get_client_ip(request)
     user = User.objects.filter(auth_token=token).first()
     if user is None:
         return HttpResponse("Permission denied")
@@ -66,8 +61,8 @@ def review_list(request):
     latest_review_list = Review.objects.filter(user=user)
     if user.is_superuser:
         latest_review_list = Review.objects.all()
-    # print(user.username)
-    context = {'latest_review_list': latest_review_list, 'user': user}
+    ip=is_routable[0]
+    context = {'latest_review_list': latest_review_list, 'user': user, 'ip': ip}
     return render(request, 'reviews/reviews_list.html', context)
 
 

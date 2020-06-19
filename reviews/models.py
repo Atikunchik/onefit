@@ -20,3 +20,12 @@ class Review(models.Model):
     )
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE, default=None, null=True)
+
+    def full(self):
+        return {
+            'title': self.title,
+            'rating': self.rating,
+            'description': self.description,
+            'company': self.company.name,
+            'user': self.user.id,
+        }

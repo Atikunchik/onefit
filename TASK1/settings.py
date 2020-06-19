@@ -40,8 +40,16 @@ INSTALLED_APPS = [
     'reviews',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_nose',
+    'accounts'
 ]
 
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=foo,bar',
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

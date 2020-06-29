@@ -26,7 +26,8 @@ pytest==5.4.3
 sqlparse==0.3.1
 ```
 
-##Creating an admin user
+
+## Creating an admin user
 
 First we’ll need to create a user who can login to the admin site. Run the following command:
 
@@ -54,6 +55,6 @@ Password (again): *********
 Superuser created successfully.
 ```
 
-##Api documentation
+## Api documentation
 
 [link](https://documenter.getpostman.com/view/11714008/Szzn6G5x?version=latest)
